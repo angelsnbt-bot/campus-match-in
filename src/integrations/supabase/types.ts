@@ -14,13 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      waitlist_users: {
+        Row: {
+          account_created: boolean
+          branch: string
+          college: string
+          created_at: string
+          email: string
+          erp_number: string
+          id: string
+          instagram: string | null
+          looking_for: string[]
+          name: string
+          year: string
+        }
+        Insert: {
+          account_created?: boolean
+          branch: string
+          college: string
+          created_at?: string
+          email: string
+          erp_number: string
+          id?: string
+          instagram?: string | null
+          looking_for?: string[]
+          name: string
+          year: string
+        }
+        Update: {
+          account_created?: boolean
+          branch?: string
+          college?: string
+          created_at?: string
+          email?: string
+          erp_number?: string
+          id?: string
+          instagram?: string | null
+          looking_for?: string[]
+          name?: string
+          year?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_waitlist_count: { Args: never; Returns: number }
     }
     Enums: {
       [_ in never]: never
