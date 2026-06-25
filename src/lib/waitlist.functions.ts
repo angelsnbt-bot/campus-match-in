@@ -9,7 +9,10 @@ const LOOKING_FOR_OPTIONS = [
   "Hackathon Team",
   "Competition Team",
   "Event Buddies",
+  "Communities",
 ] as const;
+
+const GENDER_OPTIONS = ["Male", "Female", "Non-binary", "Prefer not to say"] as const;
 
 const submitSchema = z.object({
   name: z.string().trim().min(2).max(80),
@@ -19,7 +22,11 @@ const submitSchema = z.object({
   branch: z.string().trim().min(1).max(80),
   year: z.string().trim().min(1).max(20),
   instagram: z.string().trim().max(60).optional().or(z.literal("")),
-  looking_for: z.array(z.enum(LOOKING_FOR_OPTIONS)).min(1).max(7),
+  gender: z.enum(GENDER_OPTIONS).optional().or(z.literal("")),
+  age: z.coerce.number().int().min(15).max(60).optional().or(z.nan()),
+  sports: z.array(z.string().max(40)).max(15).default([]),
+  interests: z.array(z.string().max(40)).max(15).default([]),
+  looking_for: z.array(z.enum(LOOKING_FOR_OPTIONS)).min(1).max(LOOKING_FOR_OPTIONS.length),
   confirm: z.literal(true),
 });
 
@@ -27,6 +34,7 @@ export const submitWaitlist = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => submitSchema.parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const ageVal = typeof data.age === "number" && !Number.isNaN(data.age) ? data.age : null;
     const { error } = await supabaseAdmin.from("waitlist_users").insert({
       name: data.name,
       email: data.email,
@@ -35,6 +43,10 @@ export const submitWaitlist = createServerFn({ method: "POST" })
       branch: data.branch,
       year: data.year,
       instagram: data.instagram || null,
+      gender: data.gender || null,
+      age: ageVal,
+      sports: data.sports,
+      interests: data.interests,
       looking_for: data.looking_for,
     });
     if (error) {

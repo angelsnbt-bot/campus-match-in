@@ -17,41 +17,53 @@ export type Database = {
       waitlist_users: {
         Row: {
           account_created: boolean
+          age: number | null
           branch: string
           college: string
           created_at: string
           email: string
           erp_number: string
+          gender: string | null
           id: string
           instagram: string | null
+          interests: string[]
           looking_for: string[]
           name: string
+          sports: string[]
           year: string
         }
         Insert: {
           account_created?: boolean
+          age?: number | null
           branch: string
           college: string
           created_at?: string
           email: string
           erp_number: string
+          gender?: string | null
           id?: string
           instagram?: string | null
+          interests?: string[]
           looking_for?: string[]
           name: string
+          sports?: string[]
           year: string
         }
         Update: {
           account_created?: boolean
+          age?: number | null
           branch?: string
           college?: string
           created_at?: string
           email?: string
           erp_number?: string
+          gender?: string | null
           id?: string
           instagram?: string | null
+          interests?: string[]
           looking_for?: string[]
           name?: string
+          sports?: string[]
           year?: string
         }
         Relationships: []
