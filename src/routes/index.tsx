@@ -553,7 +553,7 @@ function WaitlistForm() {
     <form onSubmit={onSubmit} className="glass space-y-6 rounded-3xl p-6 sm:p-8">
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Full name" required>
-          <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required maxLength={80} placeholder="Arpit Kumar" />
+          <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required maxLength={80} placeholder="Your full name" autoComplete="off" />
         </Field>
         <Field label="Email" required>
           <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required maxLength={160} placeholder="you@college.edu" />
