@@ -12,7 +12,12 @@ const LOOKING_FOR_OPTIONS = [
   "Communities",
 ] as const;
 
-const GENDER_OPTIONS = ["Male", "Female", "Non-binary", "Prefer not to say"] as const;
+const GENDER_OPTIONS = [
+  "Male",
+  "Female",
+  "Non-binary",
+  "Prefer not to say",
+] as const;
 
 const submitSchema = z.object({
   name: z.string().trim().min(2).max(80),
@@ -26,7 +31,10 @@ const submitSchema = z.object({
   age: z.coerce.number().int().min(15).max(60).optional().or(z.nan()),
   sports: z.array(z.string().max(40)).max(15).default([]),
   interests: z.array(z.string().max(40)).max(15).default([]),
-  looking_for: z.array(z.enum(LOOKING_FOR_OPTIONS)).min(1).max(LOOKING_FOR_OPTIONS.length),
+  looking_for: z
+    .array(z.enum(LOOKING_FOR_OPTIONS))
+    .min(1)
+    .max(LOOKING_FOR_OPTIONS.length),
   confirm: z.literal(true),
 });
 
@@ -34,58 +42,119 @@ export const submitWaitlist = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => submitSchema.parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const ageVal = typeof data.age === "number" && !Number.isNaN(data.age) ? data.age : null;
-    const { error } = await supabaseAdmin.from("waitlist_users").insert({
-      name: data.name,
-      email: data.email,
-      erp_number: data.erp_number,
-      college: data.college,
-      branch: data.branch,
-      year: data.year,
-      instagram: data.instagram || null,
-      gender: data.gender || null,
-      age: ageVal,
-      sports: data.sports,
-      interests: data.interests,
-      looking_for: data.looking_for,
-    });
+
+    const ageVal =
+      typeof data.age === "number" && !Number.isNaN(data.age)
+        ? data.age
+        : null;
+
+    const { data: insertedData, error } = await supabaseAdmin
+      .from("waitlist_users")
+      .insert({
+        name: data.name,
+        email: data.email,
+        erp_number: data.erp_number,
+        college: data.college,
+        branch: data.branch,
+        year: data.year,
+        instagram: data.instagram || null,
+        gender: data.gender || null,
+        age: ageVal,
+        sports: data.sports,
+        interests: data.interests,
+        looking_for: data.looking_for,
+      })
+      .select();
+
     if (error) {
+      console.error("================================");
+      console.error("SUPABASE INSERT ERROR");
+      console.error(error);
+      console.error("================================");
+
       if (error.code === "23505") {
-        const dupField = error.message.toLowerCase().includes("erp") ? "ERP Number" : "Email";
+        const dupField = error.message.toLowerCase().includes("erp")
+          ? "ERP Number"
+          : "Email";
+
         throw new Error(`This ${dupField} is already on the waitlist.`);
       }
-      throw new Error("Could not join waitlist. Please try again.");
+
+      throw new Error(
+        `Supabase Error:
+Code: ${error.code}
+Message: ${error.message}
+Details: ${error.details ?? "None"}
+Hint: ${error.hint ?? "None"}`
+      );
     }
-    return { ok: true as const };
+
+    console.log("Inserted:", insertedData);
+
+    return {
+      ok: true,
+      insertedData,
+    };
   });
 
 export const getWaitlistCount = createServerFn({ method: "GET" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
   const { count, error } = await supabaseAdmin
     .from("waitlist_users")
     .select("*", { count: "exact", head: true });
-  if (error) return { count: 0, colleges: 0 };
+
+  if (error) {
+    console.error(error);
+    return { count: 0, colleges: 0 };
+  }
+
   const { data: colleges } = await supabaseAdmin
     .from("waitlist_users")
     .select("college");
-  const uniqueColleges = new Set((colleges ?? []).map((r) => r.college.trim().toLowerCase())).size;
-  return { count: count ?? 0, colleges: uniqueColleges };
+
+  const uniqueColleges = new Set(
+    (colleges ?? []).map((r) => r.college.trim().toLowerCase())
+  ).size;
+
+  return {
+    count: count ?? 0,
+    colleges: uniqueColleges,
+  };
 });
 
-const adminListSchema = z.object({ token: z.string().min(1) });
+const adminListSchema = z.object({
+  token: z.string().min(1),
+});
 
 export const getWaitlistAdmin = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => adminListSchema.parse(input))
   .handler(async ({ data }) => {
     const expected = process.env.ADMIN_TOKEN;
+
     if (!expected || data.token !== expected) {
       throw new Error("Invalid admin token");
     }
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
     const { data: rows, error } = await supabaseAdmin
       .from("waitlist_users")
       .select("*")
       .order("created_at", { ascending: false });
-    if (error) throw new Error("Failed to load waitlist");
-    return { rows: rows ?? [] };
+
+    if (error) {
+      console.error(error);
+
+      throw new Error(
+        `Supabase Error:
+Code: ${error.code}
+Message: ${error.message}
+Details: ${error.details ?? "None"}`
+      );
+    }
+
+    return {
+      rows: rows ?? [],
+    };
   });
