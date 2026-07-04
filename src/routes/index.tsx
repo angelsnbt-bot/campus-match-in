@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import heroBg from "@/assets/hero-bg.jpg";
-import logoAsset from "@/assets/campusmatch-logo.png.asset.json";
+const logoAsset = { url: "/campusmatch-logo.png" };
 import { submitWaitlist, getWaitlistCount } from "@/lib/waitlist.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
