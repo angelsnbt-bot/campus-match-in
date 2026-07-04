@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import heroBg from "@/assets/hero-bg.jpg";
+import logoAsset from "@/assets/campusmatch-logo.png.asset.json";
 import { submitWaitlist, getWaitlistCount } from "@/lib/waitlist.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -136,10 +137,12 @@ function LandingPage() {
 function Nav() {
   return (
     <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-5 py-6 sm:px-8">
-      <div className="flex items-center gap-2 font-display text-xl font-bold">
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-brand shadow-glow">
-          <Sparkles className="h-4 w-4 text-white" />
-        </span>
+      <div className="flex items-center gap-2.5 font-display text-xl font-bold">
+        <img
+          src={logoAsset.url}
+          alt="CampusMatch"
+          className="h-9 w-9 rounded-xl object-cover shadow-glow"
+        />
         CampusMatch
       </div>
       <div className="hidden items-center gap-2 text-sm text-muted-foreground sm:flex">
