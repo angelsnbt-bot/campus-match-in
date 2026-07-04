@@ -184,7 +184,7 @@ function Hero({ count }: { count: number }) {
         className="mx-auto mt-6 max-w-2xl text-base text-muted-foreground sm:text-lg"
       >
         Currently launching at <span className="font-semibold text-foreground">Vivekananda Global University (VGU)</span>.
-        Friends · Dating · Study Partners · Sports Teams · Hackathon Squads — all verified by ERP.
+        Friends · Dating · Study Partners · Sports Teams · Hackathon Squads · Events & Trips — all verified by ERP.
       </motion.p>
 
       <motion.div
